@@ -1,7 +1,10 @@
+"use client";
 import { Button } from "@/components/ui/button";
+import { useNewTaskModal } from "@/hooks/use-task";
 import { PlusCircle } from "lucide-react";
 
 export const TitleAction = () => {
+  const { onOpen } = useNewTaskModal();
   return (
     <div className="flex justify-between">
       <div>
@@ -10,7 +13,7 @@ export const TitleAction = () => {
           Easily manage and track your tasks
         </p>
       </div>
-      <Button>
+      <Button onClick={onOpen}>
         <PlusCircle />
         Add new task
       </Button>
