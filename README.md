@@ -96,6 +96,7 @@ src/
 │
 └── providers/                 # react providers
     └── dialog-providers.tsx   # modal providers
+    └── theme-providers.tsx   # theme providers
 ```
 
 ## tech stack
