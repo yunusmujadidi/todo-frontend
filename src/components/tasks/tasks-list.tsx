@@ -3,20 +3,22 @@
 import { useEffect, useState } from "react";
 import { TaskCard } from "@/components/cards/task-card";
 import { getTasks, updateTask, deleteTask } from "@/lib/api";
-import { Task } from "@/lib/types";
+import { FilterStatus, Task } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 export const TasksList = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
 
-  const fetchTasks = async () => {
+  const fetchTasks = async (status?: string) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await getTasks();
+      const response = await getTasks(status);
       const tasksData = Array.isArray(response.data)
         ? response.data
         : response.data?.tasks || [];
@@ -28,6 +30,15 @@ export const TasksList = () => {
     }
   };
 
+  const handleFilterChange = (status: FilterStatus) => {
+    setFilterStatus(status);
+    if (status === "all") {
+      fetchTasks();
+    } else {
+      fetchTasks(status);
+    }
+  };
+
   const handleUpdateStatus = async (taskId: number, status: Task["status"]) => {
     try {
       const task = tasks.find((t) => t.id === taskId);
@@ -35,7 +46,7 @@ export const TasksList = () => {
 
       await updateTask(taskId, task.title, task.description, status);
       toast.success("Task status updated successfully");
-      fetchTasks();
+      handleFilterChange(filterStatus);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to update task");
     }
@@ -45,18 +56,27 @@ export const TasksList = () => {
     try {
       await deleteTask(taskId);
       toast.success("Task deleted successfully");
-      fetchTasks();
+      handleFilterChange(filterStatus);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to delete task");
     }
   };
 
   useEffect(() => {
-    fetchTasks();
+    // Initial fetch
+    if (filterStatus === "all") {
+      fetchTasks();
+    } else {
+      fetchTasks(filterStatus);
+    }
 
     // listen for task updates
     const handleTaskUpdate = () => {
-      fetchTasks();
+      if (filterStatus === "all") {
+        fetchTasks();
+      } else {
+        fetchTasks(filterStatus);
+      }
     };
 
     window.addEventListener("taskUpdated", handleTaskUpdate);
@@ -64,42 +84,95 @@ export const TasksList = () => {
     return () => {
       window.removeEventListener("taskUpdated", handleTaskUpdate);
     };
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="rounded-md bg-red-50 p-4 text-sm text-red-600">
-        {error}
-      </div>
-    );
-  }
-
-  if (tasks.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">No tasks yet. Create your first task!</p>
-      </div>
-    );
-  }
+  }, [filterStatus]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {tasks.map((task) => (
-        <TaskCard
-          key={task.id}
-          task={task}
-          onUpdateStatus={(status) => handleUpdateStatus(task.id, status)}
-          onDelete={() => handleDelete(task.id)}
-        />
-      ))}
+    <div className="space-y-6">
+      {/* Filter Buttons */}
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant={filterStatus === "all" ? "default" : "outline"}
+          onClick={() => handleFilterChange("all")}
+          disabled={isLoading}
+        >
+          All Tasks
+        </Button>
+        <Button
+          variant={filterStatus === "pending" ? "default" : "outline"}
+          onClick={() => handleFilterChange("pending")}
+          disabled={isLoading}
+          className={
+            filterStatus === "pending"
+              ? ""
+              : "hover:bg-yellow-500/10 hover:text-yellow-700 hover:border-yellow-500/50"
+          }
+        >
+          Pending
+        </Button>
+        <Button
+          variant={filterStatus === "in-progress" ? "default" : "outline"}
+          onClick={() => handleFilterChange("in-progress")}
+          disabled={isLoading}
+          className={
+            filterStatus === "in-progress"
+              ? ""
+              : "hover:bg-blue-500/10 hover:text-blue-700 hover:border-blue-500/50"
+          }
+        >
+          In Progress
+        </Button>
+        <Button
+          variant={filterStatus === "done" ? "default" : "outline"}
+          onClick={() => handleFilterChange("done")}
+          disabled={isLoading}
+          className={
+            filterStatus === "done"
+              ? ""
+              : "hover:bg-green-500/10 hover:text-green-700 hover:border-green-500/50"
+          }
+        >
+          Done
+        </Button>
+      </div>
+
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        </div>
+      )}
+
+      {/* Error State */}
+      {!isLoading && error && (
+        <div className="rounded-md bg-red-50 p-4 text-sm text-red-600">
+          {error}
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!isLoading && !error && tasks.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-gray-500">
+            {filterStatus === "all"
+              ? "No tasks yet. Create your first task!"
+              : `No ${filterStatus.replace("-", " ")} tasks found.`}
+          </p>
+        </div>
+      )}
+
+      {/* Tasks Grid */}
+      {!isLoading && !error && tasks.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {tasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              onUpdateStatus={(status) => handleUpdateStatus(task.id, status)}
+              onDelete={() => handleDelete(task.id)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
