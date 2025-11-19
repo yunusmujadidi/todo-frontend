@@ -1,5 +1,13 @@
+import { TitleAction } from "@/components/layout/title-action";
+import { TasksTable } from "@/components/tasks/tasks-table";
+
 const TasksPage = () => {
-  return <div>tasks page</div>;
+  return (
+    <div className="p-6 space-y-6">
+      <TitleAction />
+      <TasksTable />
+    </div>
+  );
 };
 
 export default TasksPage;
