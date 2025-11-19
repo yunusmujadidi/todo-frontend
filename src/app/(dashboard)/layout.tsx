@@ -7,6 +7,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { TaskModal } from "@/components/modal/task-modal";
+import { EditTaskModal } from "@/components/modal/edit-task-modal";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
@@ -28,6 +29,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         {children}
       </SidebarInset>
       <TaskModal />
+      <EditTaskModal />
     </SidebarProvider>
   );
 };

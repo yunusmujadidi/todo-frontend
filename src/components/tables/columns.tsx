@@ -14,7 +14,8 @@ import { statusColors, statusLabels } from "@/lib/utils";
 
 export const createColumns = (
   onUpdateStatus: (taskId: number, status: Task["status"]) => void,
-  onDelete: (taskId: number) => void
+  onDelete: (taskId: number) => void,
+  onEdit: (task: Task) => void
 ): ColumnDef<Task>[] => [
   {
     accessorKey: "title",
@@ -100,7 +101,12 @@ export const createColumns = (
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onUpdateStatus(task.id, "pending")}>
+            <DropdownMenuItem onClick={() => onEdit(task)}>
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onUpdateStatus(task.id, "pending")}
+            >
               Mark Pending
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -123,4 +129,3 @@ export const createColumns = (
     },
   },
 ];
-

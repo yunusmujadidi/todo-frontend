@@ -16,9 +16,15 @@ interface TaskCardProps {
   task: Task;
   onUpdateStatus: (status: Task["status"]) => void;
   onDelete: () => void;
+  onEdit: () => void;
 }
 
-export function TaskCard({ task, onUpdateStatus, onDelete }: TaskCardProps) {
+export function TaskCard({
+  task,
+  onUpdateStatus,
+  onDelete,
+  onEdit,
+}: TaskCardProps) {
   const [ConfirmDialog, confirm] = useConfirm(
     "Delete Task",
     "Are you sure you want to delete this task? This action cannot be undone."
@@ -46,6 +52,7 @@ export function TaskCard({ task, onUpdateStatus, onDelete }: TaskCardProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onUpdateStatus("pending")}>
                   Mark Pending
                 </DropdownMenuItem>

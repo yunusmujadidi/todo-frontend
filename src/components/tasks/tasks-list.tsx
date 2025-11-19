@@ -7,12 +7,15 @@ import { FilterStatus, Task } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { useEditTaskModal } from "@/hooks/use-task";
 
 export const TasksList = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
+
+  const { onOpen: openEditModal } = useEditTaskModal();
 
   const fetchTasks = async (status?: string) => {
     setIsLoading(true);
@@ -50,6 +53,10 @@ export const TasksList = () => {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to update task");
     }
+  };
+
+  const handleEdit = (task: Task) => {
+    openEditModal(task);
   };
 
   const handleDelete = async (taskId: number) => {
@@ -169,6 +176,7 @@ export const TasksList = () => {
               task={task}
               onUpdateStatus={(status) => handleUpdateStatus(task.id, status)}
               onDelete={() => handleDelete(task.id)}
+              onEdit={() => handleEdit(task)}
             />
           ))}
         </div>

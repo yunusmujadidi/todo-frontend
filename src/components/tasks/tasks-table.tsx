@@ -8,11 +8,14 @@ import { toast } from "sonner";
 import { DataTable } from "@/components/tables/data-table";
 import { createColumns } from "@/components/tables/columns";
 import { useConfirm } from "@/hooks/use-confirm";
+import { useEditTaskModal } from "@/hooks/use-task";
 
 export const TasksTable = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { onOpen: openEditModal } = useEditTaskModal();
 
   const [ConfirmDialog, confirm] = useConfirm(
     "Delete Task",
@@ -46,6 +49,10 @@ export const TasksTable = () => {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to update task");
     }
+  };
+
+  const handleEdit = (task: Task) => {
+    openEditModal(task);
   };
 
   const handleDelete = async (taskId: number) => {
@@ -91,7 +98,7 @@ export const TasksTable = () => {
     );
   }
 
-  const columns = createColumns(handleUpdateStatus, handleDelete);
+  const columns = createColumns(handleUpdateStatus, handleDelete, handleEdit);
 
   return (
     <>
