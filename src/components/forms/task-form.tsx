@@ -8,6 +8,7 @@ import { createTask, updateTask } from "@/lib/api";
 import { Task } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 const taskFormSchema = z.object({
   title: z
@@ -39,7 +40,6 @@ interface TaskFormProps {
 
 export function TaskForm({ task, onSuccess, onCancel }: TaskFormProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -57,7 +57,6 @@ export function TaskForm({ task, onSuccess, onCancel }: TaskFormProps) {
 
   const onSubmit = async (values: TaskFormValues) => {
     setIsLoading(true);
-    setError(null);
 
     try {
       if (task) {
@@ -68,15 +67,20 @@ export function TaskForm({ task, onSuccess, onCancel }: TaskFormProps) {
           values.description,
           values.status
         );
+        toast.success("Task updated successfully");
       } else {
         // create new task
         await createTask(values.title, values.description, values.status);
+        toast.success("Task created successfully");
       }
 
       reset();
       onSuccess?.();
+
+      // emit event to refresh tasks list
+      window.dispatchEvent(new CustomEvent("taskUpdated"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save task");
+      toast.error(err instanceof Error ? err.message : "Failed to save task");
     } finally {
       setIsLoading(false);
     }
@@ -133,12 +137,6 @@ export function TaskForm({ task, onSuccess, onCancel }: TaskFormProps) {
           <p className="text-sm text-red-500">{errors.status.message}</p>
         )}
       </div>
-
-      {error && (
-        <div className="rounded-md bg-red-50 p-3 text-sm text-red-500">
-          {error}
-        </div>
-      )}
 
       <div className="flex gap-2 justify-end">
         {onCancel && (

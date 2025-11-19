@@ -15,8 +15,6 @@ export const EditTaskModal = () => {
 
   const handleSuccess = () => {
     onClose();
-    // Refresh the page to show the updated task
-    window.location.reload();
   };
 
   return (

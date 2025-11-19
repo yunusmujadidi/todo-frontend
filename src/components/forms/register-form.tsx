@@ -18,12 +18,12 @@ import { Input } from "@/components/ui/input";
 import { registerFormSchema, RegisterFormValues } from "@/lib/zod-schema";
 import { useAuth } from "@/hooks/use-auth";
 import { register as registerAPI } from "@/lib/api";
+import { toast } from "sonner";
 
 export const RegisterForm = () => {
   const router = useRouter();
   const { login: setAuth } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
@@ -38,7 +38,6 @@ export const RegisterForm = () => {
   // handle submit form
   const handleOnSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
-    setError(null);
 
     try {
       const response = await registerAPI(data.name, data.email, data.password);
@@ -46,10 +45,12 @@ export const RegisterForm = () => {
       // store auth data (zustand persist handles localStorage automatically)
       setAuth(response.data.user, response.data.token);
 
+      toast.success("Account created successfully! Welcome.");
+
       // redirect to dashboard
       router.push("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
+      toast.error(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setIsLoading(false);
     }
@@ -58,12 +59,6 @@ export const RegisterForm = () => {
   return (
     <div className="w-full max-w-md mx-auto space-y-6">
       <h2 className="text-2xl font-bold text-center">Create Account</h2>
-
-      {error && (
-        <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
-          {error}
-        </div>
-      )}
 
       <Form {...form}>
         <form
