@@ -2,6 +2,7 @@
 
 import { LogOut, MoreVertical } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 
 import {
   SidebarMenu,
@@ -26,6 +27,7 @@ export const SidebarFooter = () => {
   const isMobile = useIsMobile();
   const router = useRouter();
   const { logout, user } = useAuth();
+  const { theme, setTheme } = useTheme();
 
   const handleLogout = () => {
     logout();
@@ -84,17 +86,32 @@ export const SidebarFooter = () => {
               <DropdownMenuSeparator />
               {/* app theme */}
               <DropdownMenuLabel>App Theme</DropdownMenuLabel>
-              <DropdownMenuCheckboxItem className="cursor-pointer" disabled>
+              <DropdownMenuCheckboxItem
+                className="cursor-pointer"
+                checked={theme === "light"}
+                onClick={() => setTheme("light")}
+              >
                 Light
               </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem className="cursor-pointer" disabled>
+              <DropdownMenuCheckboxItem
+                className="cursor-pointer"
+                checked={theme === "dark"}
+                onClick={() => setTheme("dark")}
+              >
                 Dark
               </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem className="cursor-pointer" disabled>
+              <DropdownMenuCheckboxItem
+                className="cursor-pointer"
+                checked={theme === "system"}
+                onClick={() => setTheme("system")}
+              >
                 System
               </DropdownMenuCheckboxItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={handleLogout}
+              >
                 <LogOut />
                 Log out
               </DropdownMenuItem>
