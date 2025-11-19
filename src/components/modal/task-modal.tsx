@@ -15,8 +15,6 @@ export const TaskModal = () => {
 
   const handleSuccess = () => {
     onClose();
-    // Refresh the page to show the new task
-    window.location.reload();
   };
 
   return (

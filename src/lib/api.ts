@@ -5,8 +5,20 @@ type ApiOptions = Omit<RequestInit, "headers"> & {
   headers?: Record<string, string>;
 };
 
+const getToken = () => {
+  const authStorage = localStorage.getItem("auth-storage");
+  if (!authStorage) return null;
+
+  try {
+    const parsed = JSON.parse(authStorage);
+    return parsed.state?.token || null;
+  } catch {
+    return null;
+  }
+};
+
 const api = async (url: string, options: ApiOptions = {}) => {
-  const token = () => localStorage.getItem("token");
+  const token = getToken();
 
   const response = await fetch(`${API_URL}${url}`, {
     ...options,

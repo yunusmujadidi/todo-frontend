@@ -1,6 +1,7 @@
 "use client";
 
 import { LogOut, MoreVertical } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import {
   SidebarMenu,
@@ -19,9 +20,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/hooks/use-auth";
 
 export const SidebarFooter = () => {
   const isMobile = useIsMobile();
+  const router = useRouter();
+  const { logout, user } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/sign-in");
+  };
 
   return (
     <SidebarFooterUI>
@@ -34,12 +43,16 @@ export const SidebarFooter = () => {
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
                 <Avatar className="h-8 w-8 rounded-lg grayscale">
-                  <AvatarFallback className="rounded-lg">U</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {user?.name?.charAt(0).toUpperCase() || "U"}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">user Name</span>
+                  <span className="truncate font-medium">
+                    {user?.name || "User"}
+                  </span>
                   <span className="text-muted-foreground truncate text-xs">
-                    email@email.com
+                    {user?.email || "email@email.com"}
                   </span>
                 </div>
                 <MoreVertical className="ml-auto size-4" />
@@ -54,12 +67,16 @@ export const SidebarFooter = () => {
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar className="h-8 w-8 rounded-lg grayscale">
-                    <AvatarFallback className="rounded-lg">U</AvatarFallback>
+                    <AvatarFallback className="rounded-lg">
+                      {user?.name?.charAt(0).toUpperCase() || "U"}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">User Name</span>
+                    <span className="truncate font-medium">
+                      {user?.name || "User"}
+                    </span>
                     <span className="text-muted-foreground truncate text-xs">
-                      email@email.com
+                      {user?.email || "email@email.com"}
                     </span>
                   </div>
                 </div>
@@ -77,7 +94,7 @@ export const SidebarFooter = () => {
                 System
               </DropdownMenuCheckboxItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer" disabled>
+              <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
                 <LogOut />
                 Log out
               </DropdownMenuItem>
