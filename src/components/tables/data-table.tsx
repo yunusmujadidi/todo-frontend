@@ -78,7 +78,7 @@ export function DataTable<TData, TValue>({
 
   const hasActiveFilters =
     statusFilter !== "all" ||
-    (searchKey && table.getColumn(searchKey)?.getFilterValue());
+    Boolean(searchKey && table.getColumn(searchKey)?.getFilterValue());
 
   const clearAllFilters = () => {
     table.getColumn("status")?.setFilterValue(undefined);
@@ -263,4 +263,3 @@ export function DataTable<TData, TValue>({
     </div>
   );
 }
-
