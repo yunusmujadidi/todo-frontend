@@ -7,15 +7,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useNewTaskModal } from "@/hooks/use-task";
+import { useEditTaskModal } from "@/hooks/use-task";
 import { TaskForm } from "../forms/task-form";
 
-export const TaskModal = () => {
-  const { onClose, isOpen } = useNewTaskModal();
+export const EditTaskModal = () => {
+  const { onClose, isOpen, task } = useEditTaskModal();
 
   const handleSuccess = () => {
     onClose();
-    // Refresh the page to show the new task
+    // Refresh the page to show the updated task
     window.location.reload();
   };
 
@@ -23,12 +23,12 @@ export const TaskModal = () => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Task</DialogTitle>
-          <DialogDescription>
-            Fill in the form below to create a new task.
-          </DialogDescription>
+          <DialogTitle>Edit Task</DialogTitle>
+          <DialogDescription>Update the task details below.</DialogDescription>
         </DialogHeader>
-        <TaskForm onSuccess={handleSuccess} onCancel={onClose} />
+        {task && (
+          <TaskForm task={task} onSuccess={handleSuccess} onCancel={onClose} />
+        )}
       </DialogContent>
     </Dialog>
   );
